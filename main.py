@@ -3,11 +3,9 @@ import asyncio
 
 async def main():
     pygame.init()
-    # Tamaño fijo para la web
     screen = pygame.display.set_mode((450, 600))
     pygame.display.set_caption("Tic Tac Toe - Tortugas y Ballenas")
 
-    # Intentar cargar imágenes con manejo de errores para verlos en consola
     try:
         fondo = pygame.image.load('static-1/tablero.jpg').convert()
         ballena = pygame.image.load('static-1/x.png').convert_alpha()
@@ -15,7 +13,6 @@ async def main():
         print("Imágenes cargadas correctamente")
     except Exception as e:
         print(f"ERROR CARGANDO IMÁGENES: {e}")
-        # Si fallan las imágenes, el juego se detendrá aquí y verás el porqué en la consola F12
         return
 
     fondo = pygame.transform.scale(fondo, (450, 600))
@@ -26,20 +23,48 @@ async def main():
                   [(30, 195), (155, 195), (280, 195)],
                   [(30, 335), (155, 335), (280, 335)]]
 
-    tablero = [['', '', ''], ['', '', ''], ['', '', '']]
-    turno, ganador, tiempo_fin = 'X', None, None
+    def verificar_ganador(tablero):
+        for i in range(3):
+            if tablero[i][0] == tablero[i][1] == tablero[i][2] != '':
+                return tablero[i][0]
+        for j in range(3):
+            if tablero[0][j] == tablero[1][j] == tablero[2][j] != '':
+                return tablero[0][j]
+        if tablero[0][0] == tablero[1][1] == tablero[2][2] != '':
+            return tablero[0][0]
+        if tablero[0][2] == tablero[1][1] == tablero[2][0] != '':
+            return tablero[0][2]
+        return None
+
+    def reiniciar():
+        return [['', '', ''], ['', '', ''], ['', '', '']], 'X', None, None
+
+    tablero, turno, ganador, tiempo_fin = reiniciar()
     fuente = pygame.font.SysFont(None, 50)
     clock = pygame.time.Clock()
     running = True
 
     while running:
         screen.blit(fondo, (0, 0))
-        
-        # Dibujar tablero
+
         for i in range(3):
             for j in range(3):
-                if tablero[i][j] == 'X': screen.blit(ballena, coordinate[i][j])
-                elif tablero[i][j] == 'O': screen.blit(tortuga, coordinate[i][j])
+                if tablero[i][j] == 'X':
+                    screen.blit(ballena, coordinate[i][j])
+                elif tablero[i][j] == 'O':
+                    screen.blit(tortuga, coordinate[i][j])
+
+        if ganador:
+            if ganador == 'X':
+                mensaje = "Ganaron las Ballenas!"
+            else:
+                mensaje = "Ganaron las Tortugas!"
+            texto = fuente.render(mensaje, True, (255, 255, 0))
+            rect = texto.get_rect(center=(225, 500))
+            screen.blit(texto, rect)
+
+            if pygame.time.get_ticks() - tiempo_fin > 3000:
+                tablero, turno, ganador, tiempo_fin = reiniciar()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -49,18 +74,14 @@ async def main():
                 fila, col = mousey // 150, mousex // 150
                 if 0 <= fila < 3 and 0 <= col < 3 and tablero[fila][col] == '':
                     tablero[fila][col] = turno
-                    # Lógica de ganador (puedes añadirla aquí)
-                    turno = 'O' if turno == 'X' else 'X'
+                    ganador = verificar_ganador(tablero)
+                    if ganador:
+                        tiempo_fin = pygame.time.get_ticks()
+                    else:
+                        turno = 'O' if turno == 'X' else 'X'
 
         pygame.display.update()
-        
-        # ESTO ES LO MÁS IMPORTANTE PARA QUE NO SE QUEDE NEGRO
-        await asyncio.sleep(0) 
+        await asyncio.sleep(0)
         clock.tick(30)
 
-# Iniciar el bucle
 asyncio.run(main())
-
-
-           
-
