@@ -5,9 +5,9 @@ screen = pygame.display.set_mode((450, 600))
 pygame.display.set_caption("Tic Tac Toe - Tortugas y Ballenas")
 
 # Asegúrate de que estas imágenes existan en la carpeta 'static'
-fondo = pygame.image.load('static/tablero.jpg')
-ballena = pygame.image.load('static/x.png')
-tortuga = pygame.image.load('static/o.png')
+fondo = pygame.image.load('static-1/tablero.jpg')
+ballena = pygame.image.load('static-1/x.png')
+tortuga = pygame.image.load('static-1/o.png')
 
 fondo = pygame.transform.scale(fondo, (450, 600))
 ballena = pygame.transform.scale(ballena, (140, 140))
@@ -102,6 +102,8 @@ async def main():
 
 running = True
 asyncio.run(main())
+
+
 
            
 
