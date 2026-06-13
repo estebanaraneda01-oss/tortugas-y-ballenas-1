@@ -1,5 +1,5 @@
 import pygame
-
+import asyncio
 pygame.init()
 screen = pygame.display.set_mode((450, 600))
 pygame.display.set_caption("Tic Tac Toe - Tortugas y Ballenas")
@@ -65,40 +65,43 @@ def reiniciar_juego():
     ganador = None
     tiempo_fin = None
 
-# --- Bucle Principal ---
+async def main():
+    global running, ganador, tiempo_fin, turno, tablero
+    while running:
+        clock.tick(30)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            
+            elif event.type == pygame.MOUSEBUTTONDOWN and ganador is None:
+                mousex, mousey = pygame.mouse.get_pos()
+                fila = mousey // 150
+                col = mousex // 150
+
+                if 0 <= fila < 3 and 0 <= col < 3:
+                    if tablero[fila][col] == '':
+                        tablero[fila][col] = turno
+                        ganador = verificar_ganador()
+                        if ganador is None:
+                            turno = 'O' if turno == 'X' else 'X'
+                        else:
+                            tiempo_fin = pygame.time.get_ticks()
+
+        screen.blit(fondo, (0, 0))
+        graficar_tablero()
+
+        if ganador is not None:
+            dibujar_texto_ganador(ganador)
+            if pygame.time.get_ticks() - tiempo_fin > 3000:
+                reiniciar_juego()
+
+        pygame.display.update()
+        await asyncio.sleep(0)
+
+    pygame.quit()
+
 running = True
-while running:
-    clock.tick(30)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        
-        elif event.type == pygame.MOUSEBUTTONDOWN and ganador is None:
-            mousex, mousey = pygame.mouse.get_pos()
-            fila = mousey // 150
-            col = mousex // 150
-
-            if 0 <= fila < 3 and 0 <= col < 3:
-                if tablero[fila][col] == '':
-                    tablero[fila][col] = turno
-                    ganador = verificar_ganador()
-                    if ganador is None:
-                        turno = 'O' if turno == 'X' else 'X'
-                    else:
-                        tiempo_fin = pygame.time.get_ticks()
-
-    screen.blit(fondo, (0, 0))
-    graficar_tablero()
-
-    if ganador is not None:
-        dibujar_texto_ganador(ganador)
-        if pygame.time.get_ticks() - tiempo_fin > 3000:
-            reiniciar_juego()
-
-    pygame.display.update()
-
-pygame.quit()
-
+asyncio.run(main())
 
            
 
