@@ -1,28 +1,26 @@
 import pygame
 import asyncio
 
-# Inicializar pygame fuera para que esté listo
-pygame.init()
-
 async def main():
+    pygame.init()
+    # Tamaño fijo para la web
     screen = pygame.display.set_mode((450, 600))
     pygame.display.set_caption("Tic Tac Toe - Tortugas y Ballenas")
 
-    # CARGA DE IMÁGENES - Ajusta los nombres EXACTOS (minusculas/mayusculas)
+    # Intentar cargar imágenes con manejo de errores para verlos en consola
     try:
-        # Usamos nombres relativos. Asegúrate de que existan en la carpeta static-1
-        fondo = pygame.image.load('static-1/tablero.jpg')
-        ballena = pygame.image.load('static-1/x.png')
-        tortuga = pygame.image.load('static-1/o.png')
+        fondo = pygame.image.load('static-1/tablero.jpg').convert()
+        ballena = pygame.image.load('static-1/x.png').convert_alpha()
+        tortuga = pygame.image.load('static-1/o.png').convert_alpha()
+        print("Imágenes cargadas correctamente")
     except Exception as e:
-        print(f"ERROR CARGANDO IMAGENES: {e}")
-        return # Si falla, se detiene aquí y verás el error en la consola F12
+        print(f"ERROR CARGANDO IMÁGENES: {e}")
+        # Si fallan las imágenes, el juego se detendrá aquí y verás el porqué en la consola F12
+        return
 
     fondo = pygame.transform.scale(fondo, (450, 600))
     ballena = pygame.transform.scale(ballena, (140, 140))
     tortuga = pygame.transform.scale(tortuga, (140, 140))
-    ballena.set_colorkey((0, 0, 0))
-    tortuga.set_colorkey((0, 0, 0))
 
     coordinate = [[(30, 50), (155, 50), (280, 50)],
                   [(30, 195), (155, 195), (280, 195)],
@@ -51,19 +49,17 @@ async def main():
                 fila, col = mousey // 150, mousex // 150
                 if 0 <= fila < 3 and 0 <= col < 3 and tablero[fila][col] == '':
                     tablero[fila][col] = turno
-                    # Verificar ganador simple (puedes meter tu función aquí o simplificar)
-                    # ... (lógica de victoria) ...
+                    # Lógica de ganador (puedes añadirla aquí)
                     turno = 'O' if turno == 'X' else 'X'
 
         pygame.display.update()
         
-        # VITAL PARA LA WEB:
+        # ESTO ES LO MÁS IMPORTANTE PARA QUE NO SE QUEDE NEGRO
         await asyncio.sleep(0) 
         clock.tick(30)
 
-# Iniciar el bucle de asyncio
+# Iniciar el bucle
 asyncio.run(main())
-
 
 
            
